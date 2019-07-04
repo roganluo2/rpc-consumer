@@ -13,12 +13,9 @@ import java.lang.reflect.Proxy;
  */
 @Data
 @AllArgsConstructor
-public class ClientProxy<T> {
-    private String ip;
-    private int port;
+public class ClientProxy {
 
-
-    public T getProxyClient(Class<T> tClass)
+    public <T>T getProxyClient(Class<T> tClass, String ip, int port)
     {
         return (T) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[]{tClass}, new ClientHandler(ip, port));
     }
