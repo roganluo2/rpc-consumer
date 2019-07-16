@@ -10,13 +10,9 @@ import java.io.Serializable;
  * @Created by rogan.luo
  */
 @Data
-public class RpcRequest {
+public class RpcReponse implements Serializable {
 
-    private String className;
-
-    private String methodName;
-
-    private Object[] params;
+    private Object obj;
 
     private String id;
 

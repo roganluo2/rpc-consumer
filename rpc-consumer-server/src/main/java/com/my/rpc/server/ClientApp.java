@@ -2,6 +2,7 @@ package com.my.rpc.server;
 
 import com.my.rpc.entity.User;
 import com.my.rpc.server.proxy.ClientProxy;
+import com.my.rpc.server.proxy.NettyProxy;
 import com.my.rpc.service.UserService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,11 +16,9 @@ import org.springframework.context.annotation.ComponentScan;
 public class ClientApp {
 
     public static void main(String[] args) {
-        String ip = "127.0.0.1";
-        int port = 8080;
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(ClientApp.class);
-        ClientProxy clientProxy = applicationContext.getBean("clientProxy", ClientProxy.class);
-        UserService userService = clientProxy.getProxyClient(UserService.class, ip, port);
+        NettyProxy nettyProxy = applicationContext.getBean("nettyProxy", NettyProxy.class);
+        UserService userService = nettyProxy.getProxyClient(UserService.class);
         User user = new User();
         user.setName("NIXK");
         String byId = userService.save(user);
