@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
  * @Date 2019/7/10 14:23
  * @Created by rogan.luo
  */
-@AllArgsConstructor
+ @AllArgsConstructor
 public class NettyClient {
 
     private Channel channel;
