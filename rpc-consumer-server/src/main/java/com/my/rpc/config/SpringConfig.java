@@ -1,7 +1,5 @@
 package com.my.rpc.config;
 
-import com.my.rpc.server.netty.NettyClient;
-import com.my.rpc.server.proxy.ClientProxy;
 import com.my.rpc.server.proxy.NettyProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,13 +12,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SpringConfig {
 
-    @Bean
-    public ClientProxy clientProxy()
-    {
-        return new ClientProxy();
-    }
+//    @Bean
+//    public ClientProxy clientProxy()
+//    {
+//        return new ClientProxy();
+//    }
 
-    @Bean(initMethod = "init")
+//    @Bean(initMethod = "init")
+    @Bean
     public NettyProxy nettyProxy()
     {
         return new NettyProxy("127.0.0.1", 8080);

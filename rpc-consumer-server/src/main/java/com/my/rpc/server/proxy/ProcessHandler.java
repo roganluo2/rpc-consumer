@@ -5,6 +5,8 @@ import com.my.rpc.handler.NettyClientHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.rmi.Remote;
+
 /**
  * @Description TODO
  * @Date 2019/7/10 16:22
@@ -25,7 +27,7 @@ public class ProcessHandler extends SimpleChannelInboundHandler<RpcReponse> {
 
     @Override
     protected void messageReceived(ChannelHandlerContext chx, RpcReponse rpcReponse) throws Exception {
-        NettyClientHandler.doResponse(rpcReponse);
+//        NettyClientHandler.doResponse(rpcReponse);
     }
 
     @Override
