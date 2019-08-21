@@ -7,6 +7,9 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -30,9 +33,9 @@ public class NettyProxy {
 
     private Channel channel;
 
-    public <T>T getProxyClient(Class<T> tClass)
+    public <T>T getProxyClient(Class<T> tClass, String version )
     {
-        return (T) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[]{tClass}, new NettyClientHandler(channel));
+        return (T) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[]{tClass}, new NettyClientHandler(channel, version));
     }
 
     public void init(){
@@ -46,6 +49,8 @@ public class NettyProxy {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast(new ObjectEncoder());
+                        pipeline.addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.weakCachingResolver(null)));
                         pipeline.addLast(new ProcessHandler());
                     }
                 });

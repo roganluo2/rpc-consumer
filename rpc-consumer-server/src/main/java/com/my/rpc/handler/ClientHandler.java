@@ -1,12 +1,11 @@
 package com.my.rpc.handler;
 
-import com.my.rpc.protocol.RpcRequest;
+import com.my.rpc.entity.RpcRequest;
 import com.my.rpc.server.bio.RpcClient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**

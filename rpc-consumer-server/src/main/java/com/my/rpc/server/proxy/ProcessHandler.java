@@ -1,22 +1,18 @@
 package com.my.rpc.server.proxy;
 
-import com.alibaba.fastjson.JSONObject;
+import com.my.rpc.entity.RpcReponse;
 import com.my.rpc.handler.NettyClientHandler;
-import com.my.rpc.protocol.RpcReponse;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * @Description TODO
  * @Date 2019/7/10 16:22
  * @Created by rogan.luo
  */
-public class ProcessHandler extends ChannelInboundHandlerAdapter {
+public class ProcessHandler extends SimpleChannelInboundHandler<RpcReponse> {
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    /*public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
         Channel channel = ctx.channel();
         ByteBuf buf = (ByteBuf) msg;
@@ -25,6 +21,11 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
         String str = new String(bytes,"utf-8");
         NettyClientHandler.doResponse(channel, JSONObject.parseObject(str, RpcReponse.class));
 
+    }*/
+
+    @Override
+    protected void messageReceived(ChannelHandlerContext chx, RpcReponse rpcReponse) throws Exception {
+        NettyClientHandler.doResponse(rpcReponse);
     }
 
     @Override

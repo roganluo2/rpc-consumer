@@ -1,11 +1,10 @@
 package com.my.rpc.handler;
 
-import com.my.rpc.protocol.RpcReponse;
-import com.my.rpc.protocol.RpcRequest;
-import com.my.rpc.server.bio.RpcClient;
-import com.my.rpc.server.netty.NettyClient;
+import com.alibaba.fastjson.JSONObject;
+import com.my.rpc.entity.RpcReponse;
+import com.my.rpc.entity.RpcRequest;
 import io.netty.channel.Channel;
-import lombok.AllArgsConstructor;
+import io.netty.channel.ChannelFutureListener;
 import lombok.Data;
 
 import java.lang.reflect.InvocationHandler;
@@ -25,10 +24,12 @@ import java.util.concurrent.locks.ReentrantLock;
 @Data
 public class NettyClientHandler implements InvocationHandler {
     private Channel channel;
+    private String version;
 
-    public NettyClientHandler(Channel channel)
+    public NettyClientHandler(Channel channel, String version)
     {
         this.channel = channel;
+        this.version = version;
     }
 
     private Lock lock = new ReentrantLock();
@@ -43,11 +44,19 @@ public class NettyClientHandler implements InvocationHandler {
         RpcRequest rpcRequest = new RpcRequest();
         rpcRequest.setClassName(method.getDeclaringClass().getName());
         rpcRequest.setMethodName(method.getName());
+        if(method.getName().equals("toString"))
+        {
+            return args.toString();
+        }
         rpcRequest.setParams(args);
+        rpcRequest.setVersion(version);
         String id = UUID.randomUUID().toString();
         rpcRequest.setId(id);
-        new NettyClient(channel).sendRequest(rpcRequest);
+        System.out.println(JSONObject.toJSONString(rpcRequest));
         lock.lock();
+
+//        new NettyClient(channel).sendRequest(rpcRequest);
+        channel.writeAndFlush(rpcRequest);
         try {
             reqMap.put(id, condition);
             condition.await();
@@ -60,8 +69,7 @@ public class NettyClientHandler implements InvocationHandler {
         return resMap.get(id);
     }
 
-    public static void doResponse(Channel channel, Object obj){
-        RpcReponse rpcReponse = (RpcReponse) obj;
+    public static void doResponse( RpcReponse rpcReponse){
         String id = rpcReponse.getId();
         Condition condition = reqMap.remove(id);
         resMap.put(id, rpcReponse.getObj());

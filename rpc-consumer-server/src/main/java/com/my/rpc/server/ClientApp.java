@@ -18,7 +18,7 @@ public class ClientApp {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(ClientApp.class);
         NettyProxy nettyProxy = applicationContext.getBean("nettyProxy", NettyProxy.class);
-        UserService userService = nettyProxy.getProxyClient(UserService.class);
+        UserService userService = nettyProxy.getProxyClient(UserService.class, "v1");
         User user = new User();
         user.setName("NIXK");
         String byId = userService.save(user);
