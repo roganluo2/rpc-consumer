@@ -1,6 +1,8 @@
 package com.my.rpc.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.my.rpc.discovery.IServiceDiscovery;
+import com.my.rpc.discovery.ServiceDiscoveryWithZK;
 import com.my.rpc.entity.RpcReponse;
 import com.my.rpc.entity.RpcRequest;
 import com.my.rpc.server.proxy.RomoteMsgSend;
@@ -24,14 +26,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class NettyClientHandler implements InvocationHandler {
     private String version;
 
-    private String ip;
+    private IServiceDiscovery discovery ;
 
-    private int port;
-
-    public NettyClientHandler(String version, String ip, int port) {
+    public NettyClientHandler(IServiceDiscovery serviceDiscovery,String version) {
         this.version = version;
-        this.ip = ip;
-        this.port = port;
+        this.discovery = serviceDiscovery;
     }
 
 
@@ -44,14 +43,16 @@ public class NettyClientHandler implements InvocationHandler {
         rpcRequest.setMethodName(method.getName());
         if(method.getName().equals("toString"))
         {
-            return args.toString();
+            return JSONObject.toJSONString(args);
         }
         rpcRequest.setParams(args);
         rpcRequest.setVersion(version);
         String id = UUID.randomUUID().toString();
         rpcRequest.setId(id);
         System.out.println(JSONObject.toJSONString(rpcRequest));
-       return new RomoteMsgSend(ip, port).send(rpcRequest);
+        String servicePath =  rpcRequest.getClassName() + "-" + rpcRequest.getVersion();
+        String address = this.discovery.discovery(servicePath);
+       return new RomoteMsgSend().send(rpcRequest, address);
     }
 
 

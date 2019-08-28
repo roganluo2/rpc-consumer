@@ -22,7 +22,7 @@ public class SpringConfig {
     @Bean
     public NettyProxy nettyProxy()
     {
-        return new NettyProxy("127.0.0.1", 8080);
+        return new NettyProxy();
     }
 
 }

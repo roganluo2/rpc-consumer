@@ -1,5 +1,6 @@
 package com.my.rpc.server.proxy;
 
+import com.my.rpc.discovery.IServiceDiscovery;
 import com.my.rpc.entity.RpcReponse;
 import com.my.rpc.entity.RpcRequest;
 import io.netty.bootstrap.Bootstrap;
@@ -13,19 +14,14 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 
 public class RomoteMsgSend extends SimpleChannelInboundHandler<RpcReponse>  {
 
-    private String ip;
-    private int port;
 
-    public RomoteMsgSend(String ip, int port) {
 
-        this.ip = ip;
-        this.port = port;
-    }
+
 
     private Object result;
 
 
-    public Object send(RpcRequest rpcRequest){
+    public Object send(RpcRequest rpcRequest,String address){
         EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
 
         Bootstrap bootstrap = new Bootstrap();
@@ -38,12 +34,15 @@ public class RomoteMsgSend extends SimpleChannelInboundHandler<RpcReponse>  {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new ObjectEncoder());
                         pipeline.addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.weakCachingResolver(null)));
-                        pipeline.addLast(this);
+                        pipeline.addLast(RomoteMsgSend.this);
                     }
                 });
         try {
-            ChannelFuture channelFuture = bootstrap.connect(ip, port).sync();
+            String[] split = address.split(":");
+            ChannelFuture channelFuture = bootstrap.connect(split[0], Integer.valueOf(split[1])).sync();
             //等待客户端连接端口关闭
+//            ChannelFuture channelFuture=bootstrap.connect("192.168.0.102",8080).sync();
+            channelFuture.channel().writeAndFlush(rpcRequest).sync();
             Channel channel = channelFuture.channel();
             channel.writeAndFlush(rpcRequest).sync();
             if(rpcRequest != null) {
@@ -60,6 +59,6 @@ public class RomoteMsgSend extends SimpleChannelInboundHandler<RpcReponse>  {
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, RpcReponse rpcReponse) throws Exception {
-        this.result=rpcReponse;
+        this.result=rpcReponse.getObj();
     }
 }

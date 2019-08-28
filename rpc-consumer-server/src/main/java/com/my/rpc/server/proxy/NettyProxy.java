@@ -1,5 +1,7 @@
 package com.my.rpc.server.proxy;
 
+import com.my.rpc.discovery.IServiceDiscovery;
+import com.my.rpc.discovery.ServiceDiscoveryWithZK;
 import com.my.rpc.handler.ClientHandler;
 import com.my.rpc.handler.NettyClientHandler;
 import io.netty.bootstrap.Bootstrap;
@@ -23,45 +25,12 @@ import java.lang.reflect.Proxy;
 @Data
 public class NettyProxy {
 
-    public NettyProxy(String ip, int port) {
-        this.ip = ip;
-        this.port = port;
-    }
-
-    private String ip;
-    private int port;
+    private IServiceDiscovery serviceDiscovery=new ServiceDiscoveryWithZK();
 
 
     public <T>T getProxyClient(Class<T> tClass, String version )
     {
-        return (T) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[]{tClass}, new NettyClientHandler(version, ip, port));
-    }
-
-    public void init(){
-        EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
-
-        Bootstrap bootstrap = new Bootstrap();
-        bootstrap.group(eventLoopGroup).channel(NioSocketChannel.class)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) throws Exception {
-                        ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new ObjectEncoder());
-                        pipeline.addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
-                        pipeline.addLast(new ProcessHandler());
-                    }
-                });
-        try {
-            ChannelFuture channelFuture = bootstrap.connect(ip, port).sync();
-            //等待客户端连接端口关闭
-//            channel = channelFuture.channel();
-
-//            channel.closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        return (T) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[]{tClass}, new NettyClientHandler(serviceDiscovery,version));
     }
 
 }

@@ -19,12 +19,13 @@ public class ClientApp {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(ClientApp.class);
         NettyProxy nettyProxy = applicationContext.getBean("nettyProxy", NettyProxy.class);
         UserService userService = nettyProxy.getProxyClient(UserService.class, "v1");
-        User user = new User();
-        user.setName("NIXK");
-        String byId = userService.save(user);
-        System.out.println("请求结束：" + byId);
-
-
+//        User user = new User();
+//        user.setName("NIXK");
+//        String byId = userService.save(user);
+//        System.out.println("请求结束：" + byId);
+        for(int i=0; i < 100 ; i++) {
+            System.out.println(userService.getById(i));
+        }
         /*String ip = "127.0.0.1";
         int port = 8080;
         UserService userService = new ClientProxy<UserService>(ip, port).getProxyClient(UserService.class);
